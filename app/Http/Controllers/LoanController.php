@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Item;
 use App\Models\Loan;
 use App\Models\ItemReturn;
+use App\Models\LoanHistory;
 use Illuminate\Http\Request;
 
 class LoanController extends Controller
@@ -96,6 +97,15 @@ class LoanController extends Controller
             'status' => 'approved',
             'admin_id' => auth()->id(), // Simpan ID admin yang menyetujui
         ]);
+
+        // Catat histori
+        LoanHistory::create([
+            'loan_id'    => $loan->id,
+            'status'     => 'approved',
+            'notes'      => 'Disetujui oleh admin.',
+            'changed_by' => auth()->id(),
+            'changed_at' => now(),
+        ]);
     
         return redirect()->back()->with('success', 'Peminjaman berhasil disetujui.');
     }
@@ -114,6 +124,14 @@ class LoanController extends Controller
         $loan->update([
             'status' => 'rejected',
             'admin_id' => auth()->id(), // Catat admin yang menolak
+        ]);
+
+        LoanHistory::create([
+            'loan_id'    => $loan->id,
+            'status'     => 'rejected',
+            'notes'      => $request->notes ?? 'Ditolak oleh admin.',
+            'changed_by' => auth()->id(),
+            'changed_at' => now(),
         ]);
 
         return redirect()->route('loans.index')->with('success', 'Peminjaman berhasil ditolak.');

@@ -4,8 +4,9 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\ItemReturn;
-use Illuminate\Support\Facades\Auth;
+use App\Models\LoanHistory;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\Auth;
 
 class ReturnRequest extends Component
 {
@@ -29,6 +30,16 @@ class ReturnRequest extends Component
         $return->loan->update([
             'status' => 'returned',
             'return_date' => now(),
+        ]);
+
+        $loan = $return->loan;
+
+        LoanHistory::create([
+            'loan_id'    => $loan->id,
+            'status'     => 'returned',
+            'notes'      => 'Pengembalian disetujui oleh admin.',
+            'changed_by' => auth()->id(),
+            'changed_at' => now(),
         ]);
 
         $this->dispatch('notify', [
@@ -56,6 +67,17 @@ class ReturnRequest extends Component
         $return->loan->update([
             'status' => 'rejected',
         ]);
+
+        $loan = $return->loan;
+
+        LoanHistory::create([
+            'loan_id'    => $loan->id,
+            'status'     => 'rejected',
+            'notes'      => 'Pengembalian ditolak oleh admin.',
+            'changed_by' => auth()->id(),
+            'changed_at' => now(),
+        ]);
+        
 
         $this->dispatch('notify', [
             'type' => 'success',

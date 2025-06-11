@@ -33,8 +33,8 @@
              <h3 class="sidebar__title w-max  text-tiny pl-8 mb-4">MANAGE</h3>
 
              <div class="sidebar__list grid gap-y-4">
-                <a href="{{ route('show-home-user') }}" class="sidebar__link  ">
-                   <i class="ri-pie-chart-2-fill"></i>
+                <a href="{{ route('show-home-user') }}" class="sidebar__link {{ request()->routeIs('show-home-user') ? 'active-link' : '' }}">
+                   <i class="ri-home-9-line"></i>
                    <span class="">Home</span>
                 </a>
                 
@@ -48,7 +48,7 @@
                    <span class="">Calendar</span>
                 </a>
 
-                <a href="#" class="sidebar__link ">
+                <a href="{{ route('user.loan.history') }}" class="sidebar__link ">
                    <i class="ri-arrow-up-down-line"></i>
                    <span class="">Recent Transactions</span>
                 </a>

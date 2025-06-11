@@ -8,9 +8,9 @@
       {{ $returns->links('components.custom-pagination') }}
     </div>
   </div>
-    <table class="min-w-full text-sm">
+    <table class="overflow-hidden rounded-lg w-full">
         <thead>
-            <tr>
+            <tr class="text-xs">
                 <th class="py-2 px-4 text-start">No</th>
                 <th class="py-2 px-4 text-start">User</th>
                 <th class="py-2 px-4 text-start">Barang</th>

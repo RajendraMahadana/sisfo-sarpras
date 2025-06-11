@@ -2,29 +2,53 @@
 
 namespace App\Livewire;
 
-use App\Models\Category;
 use App\Models\Item;
 use Livewire\Component;
+use App\Models\Category;
 use App\Models\Location;
 use Livewire\WithFileUploads;
 use App\Models\LocationDetail;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Attributes\Computed;
+use Livewire\WithPagination;
 
 class ItemsManager extends Component
 {
     use WithFileUploads;
+    use WithPagination;
 
-    // Data untuk form
-    public $name, $brand, $price, $quantity, $location_id, $location_detail_id, $description, $image_path, $condition, $purchase_date, $serial_number, $category_id;
+    // Form fields
+    public $itemId;
+    public $name;
+    public $brand;
+    public $price;
+    public $quantity;
+    public $location_id;
+    public $location_detail_id;
+    public $description;
+    public $image_path;
+    public $condition = 'new';
+    public $purchase_date;
+    public $serial_number;
+    public $category_id;
+    public $keyword;
+
+    // Dropdown data
     public $locations = [];
     public $locationDetails = [];
-    public $categories;
+    public $categories = [];
 
-    // Untuk edit
-    public $itemId;
+    public $showCreateForm = false;
+    public $confirmingBulkDelete = false;
+    public $itemToDelete = null;
+    public $confirmingDeleteId = null;
 
-    // Validasi
-    protected $rules = [
+    // Daftar items
+    public $items = [];
+    public $itemsSelected = [];
+
+    public $rules = [
         'name' => 'required|string|max:255',
         'brand' => 'nullable|string|max:255',
         'price' => 'nullable|numeric|min:0',
@@ -39,15 +63,8 @@ class ItemsManager extends Component
         'category_id' => 'required|exists:categories,id',
     ];
 
-    // Daftar items
-    public $items = [];
-
-    public function mount()
-    {
-        $this->locations = Location::where('admin_id', auth()->id())->get();
-        $this->locationDetails = LocationDetail::where('admin_id', auth()->id())->get();
-        $this->categories = Category::where('admin_id', auth()->id())->get();
-        $this->items = Item::where('admin_id', auth()->id())->get();
+    public function updatedLocationID() {
+        $this->location_detail_id = null;
     }
 
     // Simpan data baru atau update
@@ -58,50 +75,36 @@ class ItemsManager extends Component
         // Upload gambar jika ada
         if ($this->image_path) {
             $imageName = $this->image_path->store('images', 'public');
-        }
+        } 
 
         // Simpan atau update data
-        Item::updateOrCreate(
+        $item = Item::updateOrCreate(
             ['id' => $this->itemId],
             [
-                'name' => $this->name,
-                'brand' => $this->brand,
-                'price' => $this->price,
-                'quantity' => $this->quantity,
-                'location_id' => $this->location_id,
-                'location_detail_id' => $this->location_detail_id,
-                'description' => $this->description,
-                'image_path' => $imageName ?? null,
-                'condition' => $this->condition,
-                'purchase_date' => $this->purchase_date,
-                'serial_number' => $this->serial_number,
-                'category_id' => $this->category_id,
-                'admin_id' => auth()->id(),
+                'name'                => $this->name,
+                'brand'               => $this->brand,
+                'price'               => $this->price,
+                'quantity'            => $this->quantity,
+                'location_id'         => $this->location_id ?: null,
+                'location_detail_id'  => $this->location_detail_id ?: null,
+                'description'         => $this->description,
+                'image_path'          => $imageName ?? null,
+                'condition'           => $this->condition,
+                'purchase_date'       => $this->purchase_date,
+                'serial_number'       => $this->serial_number,
+                'category_id'         => $this->category_id,
+                'admin_id'            => auth()->id(),
             ]
         );
 
-        $this->resetFields();
+        session()->flash('message',
+        $item->wasRecentlyCreated
+          ? 'Data berhasil ditambahkan!'
+          : 'Data berhasil diperbarui!'
+    );
         $this->items = Item::all(); // Refresh daftar
-        session()->flash('success', $this->itemId ? 'Data berhasil diperbarui!' : 'Data berhasil ditambahkan!');
+        $this->resetFields();
     }
-
-    public function updatedLocationId($value)
-    {
-        if ($value) {
-            // Ambil detail lokasi berdasarkan location_id yang dipilih
-            $this->locationDetails = LocationDetail::where('location_id', $value)->get();
-        } else {
-            // Reset detail lokasi jika lokasi tidak dipilih
-            $this->locationDetails = [];
-            $this->location_detail_id = null;
-        }
-    }
-
-    public function getLocationDetails()
-    {
-        return $this->locationDetails;
-    }
-
 
     // Edit data
     public function edit($id)
@@ -119,18 +122,65 @@ class ItemsManager extends Component
         $this->purchase_date = $item->purchase_date;
         $this->serial_number = $item->serial_number;
         $this->category_id = $item->category_id;
+
+        $this->showCreateForm = true;
     }
 
-    // Hapus data
-    public function delete($id)
+    public function confirmDeletePrompt($id)
     {
-        $item = Item::find($id);
-        if ($item->image_path) {
-            Storage::disk('public')->delete($item->image_path);
+        $this->itemToDelete         = Item::findOrFail($id);
+        $this->confirmingDeleteId   = $id;
+    }
+
+    public function confirmDelete()
+    {
+       $item = Item::where('admin_id', auth()->id())
+                    ->find($this->confirmingDeleteId);
+
+        if (! $item) {
+            session()->flash('error', 'Item tidak ditemukan atau sudah dihapus.');
+            // reset state
+            $this->confirmingDeleteId = null;
+            $this->itemToDelete       = null;
+            return $this->resetPage();
         }
+
         $item->delete();
-        $this->items = Item::all(); // Refresh daftar
-        session()->flash('success', 'Data berhasil dihapus!');
+        session()->flash('message', 'Kategori berhasil dihapus.');
+        $this->confirmingDeleteId = null;
+        $this->itemToDelete       = null;
+        $this->resetPage();
+    }
+
+    public function deleteSelected()
+    {
+        if (empty($this->itemsSelected)) {
+            session()->flash('error', 'Tidak ada kategori yang dipilih.');
+            return;
+        }
+
+        $deleted = Item::whereIn('id', $this->itemsSelected)
+            ->where('admin_id', auth()->id())
+            ->delete();
+
+        if ($deleted) {
+            session()->flash('message', 'Kategori terpilih berhasil dihapus.');
+        } else {
+            session()->flash('error', 'Gagal menghapus kategori.');
+        }
+
+        $this->itemsSelected = [];
+        $this->confirmingBulkDelete = false;
+    }
+
+    public function confirmBulkDelete()
+    {
+        if (empty($this->itemsSelected)) {
+            session()->flash('error', 'Tidak ada kategori yang dipilih.');
+            return;
+        }
+
+        $this->confirmingBulkDelete = true;
     }
 
     // Reset form
@@ -153,7 +203,29 @@ class ItemsManager extends Component
 
     public function render()
     {
-        return view('livewire.items-manager');
+
+        $query = Item::where('admin_id', auth()->id());
+
+        if (!empty($this->keyword)) {
+        $query->where(function ($q) {
+                $q->where('name', 'like', '%' . $this->keyword . '%') // nama produk
+                ->orWhereHas('location', function ($q2) {
+                    $q2->where('name', 'like', '%' . $this->keyword . '%'); // nama lokasi dari relasi
+                })
+                ->orWhereHas('category', function ($q3) {
+                    $q3->where('name', 'like', '%' . $this->keyword . '%'); // nama kategori
+                });
+            });
+        }
+        
+        return view('livewire.items-manager', [
+            'location' => Location::where('admin_id', auth()->id())->get(),
+            'locationdetails' => LocationDetail::where('location_id', $this->location_id)->get(),
+            'category' => Category::where('admin_id', auth()->id())->get(),
+            'item' => $query->paginate(5),
+        ]);
     }
 
 }
+
+

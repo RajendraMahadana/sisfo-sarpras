@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Loan;
 use Livewire\Component;
+use App\Models\LoanHistory;
 use Livewire\Attributes\On;
 use Livewire\WithPagination;
 
@@ -24,6 +25,14 @@ class LoanRequests extends Component
             'status' => 'approved',
             'admin_id' => auth()->id(),
         ]);
+
+         LoanHistory::create([
+            'loan_id'    => $loan->id,
+            'status'     => 'approved',
+            'notes'      => 'Peminjaman disetujui oleh admin.',
+            'changed_by' => auth()->id(),
+            'changed_at' => now(),
+        ]);
     }
 
     public function reject($loanId)
@@ -32,6 +41,14 @@ class LoanRequests extends Component
         $loan->update([
             'status' => 'rejected',
             'admin_id' => auth()->id(),
+        ]);
+
+        LoanHistory::create([
+            'loan_id'    => $loan->id,
+            'status'     => 'rejected',
+            'notes'      => 'Peminjaman ditolak oleh admin.',
+            'changed_by' => auth()->id(),
+            'changed_at' => now(),
         ]);
     }
 

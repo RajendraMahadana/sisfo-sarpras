@@ -4,6 +4,8 @@
     @include('admin.component.sidebar')
 
     <main class="main" id="main">
-
+       <div class="m-4 p-5 rounded-xl shadow-md">
+            @livewire('location-manager')
+        </div>
     </main>
 @endsection

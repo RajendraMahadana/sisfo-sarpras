@@ -9,9 +9,9 @@
     </div>
   </div>
 
-  <table class="min-w-full text-sm">
+  <table class="overflow-hidden rounded-lg w-full"">
     <thead>
-      <tr>
+      <tr class="text-xs">
         <th class="py-2 px-4 text-start">No</th>
         <th class="py-2 px-4 text-start">Nama Peminjam</th>
         <th class="py-2 px-4 text-start">Barang Dipinjam</th>
@@ -22,7 +22,7 @@
     </thead>
     <tbody wire:loading.class="opacity-0 transition-opacity duration-300">
       @forelse($loans as $index => $loan)
-      <tr>
+      <tr class="text-sm">
         <td class="py-2 px-4 text-start">{{ $loans->firstItem() + $index }}</td>
         <td class="py-2 px-4 text-start">{{ $loan->user->name ?? '-' }}</td>
         <td class="py-2 px-4 text-start">{{ $loan->item->name ?? '-' }}</td>
@@ -47,7 +47,7 @@
             <button wire:click="approve({{ $loan->id }})" class="text-green-500 hover:text-green-700 ml-2 text-xs font-semibold">
               <i class="ri-check-line"></i> Approve
             </button>
-            <button wire:click="reject({{ $loan->id }})" class="text-red-500 hover:text-red-700 ml-2 text-xs font-semibold">
+          <button wire:click="reject({{ $loan->id }})" class="text-red-500 hover:text-red-700 ml-2 text-xs font-semibold">
               <i class="ri-close-line"></i> Reject
             </button>
           @elseif($loan->status === 'approved')

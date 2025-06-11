@@ -12,9 +12,9 @@ return new class extends Migration
     public function up()
     {
         Schema::table('loans', function (Blueprint $table) {
-            $table->integer('quantity')->default(1)->after('item_id'); // Jumlah barang yang dipinjam
-            $table->foreignId('admin_id')->nullable()->constrained('users')->onDelete('set null')->after('user_id'); // Admin yang menangani
-            $table->text('notes')->nullable()->after('status'); // Catatan tambahan
+            $table->integer('quantity')->default(1)->after('item_id'); 
+            $table->foreignId('admin_id')->nullable()->constrained('users')->onDelete('set null')->after('user_id'); 
+            $table->text('notes')->nullable()->after('status'); 
         });
     }
 

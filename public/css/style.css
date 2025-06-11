@@ -7,12 +7,14 @@
 
   /*========== Colors ==========*/
   /*Color mode HSL(hue, saturation, lightness)*/
-  --first-color: hsl(175, 66%, 49%);
-  --title-color: hsl(62, 100%, 50%);
+  --first-color: rgb(95, 121, 227);
+  --title-color: hsl(0, 0%, 70%);
+  --thead-color: hsla(0, 0%, 74%, 0.607);
   --text-color: hsl(0, 0%, 15%);
   --body-color: rgb(250,250,250);
   --sidebar-color: rgb(250,250,250);
   --shadow-color: hsla(228, 80%, 4%, .1);
+  --input-color: hsl(0, 0%, 94%);
 
   /*========== Font and typography ==========*/
   /*.5rem = 8px | 1rem = 16px ...*/
@@ -55,6 +57,32 @@ body {
   transition: background-color .4s;
 }
 
+input {
+  background-color: var(--input-color);
+  color: var(--title-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+select {
+  background-color: var(--input-color);
+  color: var(--title-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+textarea {
+  background-color: var(--input-color);
+  color: var(--title-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+.label {
+  background-color: var(--input-color);
+  color: var(--title-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+thead {
+  background-color: var(--thead-color);
+  color: var(--text-color);
+}
+
 a {
   text-decoration: none;
 }
@@ -71,12 +99,14 @@ img {
 
 /*=============== VARIABLES DARK THEME ===============*/
 body.dark-theme {
-  --first-color: hsl(228, 70%, 63%);
+  --first-color: rgb(95, 121, 227); 
   --title-color: hsl(228, 18%, 96%);
-  --text-color: hsl(228, 12%, 61%);
-  --body-color: hsl(228, 24%, 16%);
+  --text-color: hsla(0, 0%, 73%, 0.836);
+  --body-color: rgb(31, 35, 51);
   --sidebar-color: hsl(228, 24%, 16%);
   --shadow-color: hsla(228, 80%, 4%, .3);
+  --thead-color: hsla(0, 0%, 65%, 0.267);
+  --input-color: hsl(231, 15%, 24%);
 }
 
 /*========== 
@@ -396,3 +426,59 @@ body.dark-theme {
     padding-left: 114px;
   }
 }
+
+.radio-container {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.radio-container .input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.checkmark {
+  height: 18px;
+  width: 18px;
+  background-color: var(--body-color);
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.radio-container .input:checked ~ .checkmark {
+  background-color: #4f46e5; 
+  border-color: #4f46e5;
+}
+
+.checkmark::after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.radio-container .input:checked ~ .checkmark::after {
+  display: block;
+}
+
+.radio-container .checkmark::after {
+  top: 4.4px;
+  left: 4.5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--body-color);
+}
+
+.label-text {
+  margin-left: 8px;
+  font-size: 14px;
+}
+
+  

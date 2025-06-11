@@ -43,6 +43,11 @@ class Loan extends Model
         return $this->hasOne(ItemReturn::class);
     }
 
+    public function histories()
+    {
+        return $this->hasMany(LoanHistory::class);
+    }
+
     public static function getItemsOnLoan($adminId = null)
     {
         $query = self::where('status', 'approved')

@@ -25,7 +25,7 @@ class User extends Authenticatable
         'admin_id',
     ];
 
-    public function users()
+    public function users ()
     {
         return $this->hasMany(User::class, 'admin_id');
     }

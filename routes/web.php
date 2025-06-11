@@ -7,6 +7,7 @@ use App\Http\Controllers\LoanController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\UserAdminController;
 use App\Http\Controllers\ItemReturnController;
@@ -34,6 +35,7 @@ Route::middleware(['auth'])->group(function() {
     Route::get('/loans', [LoanController::class, 'index'])->name('loans.index');
     Route::get('/loans/create', [LoanController::class, 'create'])->name('loans.create');
     Route::get('/user/loans/create/{item_id}', [UserController::class, 'createLoan'])->name('user.loans.create');
+    Route::get('/user/loan-history', [HistoryController::class, 'userHistory'])->name('user.loan.history');
     Route::get('/loans/{loan}/return', [LoanController::class, 'returnForm'])->name('loans.return.form');
     Route::get('/returns/create/{loan_id}', [ItemReturnController::class, 'create'])->name('returns.create');
     Route::post('/returns/store/{loan_id}', [ItemReturnController::class, 'store'])->name('returns.store');

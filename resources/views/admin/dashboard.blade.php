@@ -184,27 +184,89 @@
     let chart;
 
     function createChart(labels, data, label = 'Total Peminjaman') {
-        if (chart) chart.destroy();
-        chart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: label,
-                    data: data,
-                    borderColor: 'rgba(9, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    fill: true,
-                    tension: 0.5
-                }]
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: label,
+            data: data,
+            backgroundColor: 'rgba(99, 102, 241, 0.25)', // Indigo-500, 25% opacity
+            borderColor: '#6366F1', // Indigo-500
+            borderWidth: 1.5,
+            borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 },
+            maxBarThickness: 32,
+            borderSkipped: false,
+            hoverBackgroundColor: 'rgba(99, 102, 241, 0.7)', // Brighter on hover
+            hoverBorderColor: '#a5b4fc', // Lighter indigo border on hover
+            hoverBorderWidth: 1.5,
+            shadowOffsetX: 0,
+            shadowOffsetY: 4,
+            shadowBlur: 12,
+            shadowColor: 'rgba(99, 102, 241, 0.35)'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false
             },
-            options: {
-                responsive: true,
-                scales: {
-                    y: { beginAtZero: true }
-                }
+            tooltip: {
+              backgroundColor: '#fff',
+              titleColor: '#6366F1',
+              bodyColor: '#22223b',
+              borderColor: '#6366F1',
+              borderWidth: 1,
+              padding: 14,
+              cornerRadius: 10,
+              boxPadding: 8,
+              displayColors: false,
+              titleFont: { family: "'Inter', sans-serif", weight: 'semibold', size: 15 },
+              bodyFont: { family: "'Inter', sans-serif", size: 13 }
             }
-        });
+          },
+          layout: {
+            padding: {
+              left: 10,
+              right: 10,
+              top: 20,
+              bottom: 10
+            }
+          },
+          scales: {
+            x: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                color: '#6B7280',
+                font: {
+                  family: "'Inter', sans-serif",
+                  size: 10,
+                  // weight: 600
+                }
+              }
+            },
+            y: {
+              beginAtZero: true,
+              grid: {
+                // color: '#F3F4F6',
+                borderDash: [4, 4]
+              },
+              ticks: {
+                color: '#9CA3AF',
+                font: {
+                  family: "'Inter', sans-serif",
+                  size: 13,
+                  weight: 500
+                }
+              }
+            }
+          }
+        }
+      });
     }
 
     function switchChart(type) {

@@ -56,7 +56,7 @@
                    <span class="">Location</span>
                 </a>
 
-                <a href="#" class="sidebar__link ">
+                <a href="{{ route('users.index') }}" class="sidebar__link {{ request()->routeIs('users.index') ? 'active-link' : '' }}" class="sidebar__link ">
                    <i class="ri-user-settings-line"></i>
                    <span class="">Admin & User</span>
                 </a>

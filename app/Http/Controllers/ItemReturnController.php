@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Loan;
 use App\Models\ItemReturn;
+use App\Models\LoanHistory;
 use Illuminate\Http\Request;
 
 class ItemReturnController extends Controller
@@ -166,6 +167,14 @@ public function adminCreate($loan_id)
 
         $loan->update([
             'status' => 'returned',
+        ]);
+
+        LoanHistory::create([
+            'loan_id'    => $loan->id,
+            'status'     => 'returned',
+            'notes'      => 'Pengembalian dilakukan oleh admin dengan kondisi.'.$request->condition,
+            'changed_by' => auth()->id(),
+            'changed_at' => now(),
         ]);
 
         return redirect()->route('show-dashboard-admin')->with('success', 'Pengembalian berhasil dicatat oleh admin.');
